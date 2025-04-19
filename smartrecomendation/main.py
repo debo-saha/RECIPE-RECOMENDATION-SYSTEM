@@ -4,19 +4,34 @@ import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import os
+import gdown
 
 # Initialize Flask app
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all origins
 
 # Path to dataset
-file_path = 'smartrecomendation/dataset/small_dataset_low.csv'
+# file_path = 'smartrecomendation/dataset/small_dataset_low.csv'
 
-# Ensure dataset is present
+# # Ensure dataset is present
+# if not os.path.isfile(file_path):
+#     raise FileNotFoundError(f"{file_path} not found. Please upload it before deployment.")
+# Download dataset if not exists
+
+file_path = 'dataset/small_dataset_low.csv' # File path for small dataset
+# file_path = 'dataset/full_dataset.csv'    # File path for large dataset
+
+
 if not os.path.isfile(file_path):
-    raise FileNotFoundError(f"{file_path} not found. Please upload it before deployment.")
+    os.makedirs('dataset', exist_ok=True)
+    # csv_file_id = "1Yw0BQRKypCh0d-DKaX5uQLgH4qb9Owt2" # Large dataset
+    csv_file_id = "1q86MKPgjF7lapVLPaC5imGmtJGZ1abIa" # Small Dataset
+    csv_url = f"https://drive.google.com/uc?id={csv_file_id}"
+    gdown.download(csv_url, file_path, quiet=False)
+
 
 # Load and preprocess dataset
+
 df = pd.read_csv(file_path)
 
 def preprocess_ingredients(ingredient_list):
