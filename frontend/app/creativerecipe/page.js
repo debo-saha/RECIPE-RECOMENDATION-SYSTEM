@@ -30,6 +30,8 @@ export default function Home() {
     
     try {
       // const response = await fetch('http://127.0.0.1:5001/recommend',
+
+      
       const response = await fetch('https://smart-recomendation.onrender.com/recommend',
         
         {

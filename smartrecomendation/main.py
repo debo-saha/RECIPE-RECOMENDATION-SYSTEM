@@ -1,24 +1,20 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify
 from flask_cors import CORS
-import gdown
 import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import os
 
-# Initialize Flask app with CORS
-app = Flask(__name__, static_folder='static')
-CORS(app)  # Enable CORS for all routes
+# Initialize Flask app
+app = Flask(__name__)
+CORS(app)  # Enable CORS for all origins
 
-# Download dataset if not exists
-file_path = 'dataset/small_dataset_low.csv' # File path for small dataset
-# file_path = 'dataset/full_dataset.csv'    # File path for large dataset
+# Path to dataset
+file_path = 'smartrecomendation/dataset/small_dataset_low.csv'
+
+# Ensure dataset is present
 if not os.path.isfile(file_path):
-    os.makedirs('dataset', exist_ok=True)
-    # csv_file_id = "1Yw0BQRKypCh0d-DKaX5uQLgH4qb9Owt2" # Large dataset
-    csv_file_id = "1q86MKPgjF7lapVLPaC5imGmtJGZ1abIa" # Small Dataset
-    csv_url = f"https://drive.google.com/uc?id={csv_file_id}"
-    gdown.download(csv_url, file_path, quiet=False)
+    raise FileNotFoundError(f"{file_path} not found. Please upload it before deployment.")
 
 # Load and preprocess dataset
 df = pd.read_csv(file_path)
@@ -54,14 +50,6 @@ def recommend():
     recommendations = recommend_recipes(user_ingredients)
     return jsonify({"recommended_recipes": recommendations})
 
-# Serve frontend
-@app.route('/')
-def serve_frontend():
-    return send_from_directory('static', 'index.html')
-
-@app.route('/<path:path>')
-def serve_static(path):
-    return send_from_directory('static', path)
-
+# Run app
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=False)
