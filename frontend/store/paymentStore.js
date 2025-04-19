@@ -3,7 +3,8 @@ import axios from "axios";
 
 // const API_URL = import.meta.env.MODE === "development" ? "http://localhost:1000/api/auth" : "/api/auth";
 
-const API_URL = "http://localhost:1000/api/payments";
+// const API_URL = "http://localhost:1000/api/payments";
+const API_URL = "https://recipe-recomendation-system.onrender.com/api/payments";
 axios.defaults.withCredentials = true;
 
 

@@ -1,7 +1,8 @@
 import { create } from "zustand";
 import axios from "axios";
 
-const API_URL = "http://localhost:1000/api/posts";
+// const API_URL = "http://localhost:1000/api/posts";
+const API_URL = "https://recipe-recomendation-system.onrender.com/api/posts";
 axios.defaults.withCredentials = true;
 
 export const usePostStore = create((set) => ({
