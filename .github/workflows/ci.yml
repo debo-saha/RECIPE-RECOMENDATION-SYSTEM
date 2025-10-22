@@ -1,0 +1,101 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      # ------------------------------
+      # Backend
+      # ------------------------------
+      - name: Backend - Install dependencies
+        run: |
+          if [ -d "backend" ]; then
+            cd backend
+            npm ci
+          else
+            echo "⚠️ backend directory not found"
+          fi
+
+      - name: Backend - Lint (if configured)
+        run: |
+          if [ -d "backend" ]; then
+            cd backend
+            if grep -q "\"lint\":" package.json; then
+              npm run lint
+            else
+              echo "⚠️ No backend lint configured"
+            fi
+          fi
+        continue-on-error: true
+
+      - name: Backend - Test + Coverage (if configured)
+        run: |
+          if [ -d "backend" ]; then
+            cd backend
+            if grep -q "\"test\":" package.json; then
+              npm test -- --coverage
+            else
+              echo "⚠️ No backend tests configured"
+            fi
+          fi
+        continue-on-error: true
+
+      # ------------------------------
+      # Frontend
+      # ------------------------------
+      - name: Frontend - Install dependencies
+        run: |
+          if [ -d "frontend" ]; then
+            cd frontend
+            npm ci
+          else
+            echo "⚠️ frontend directory not found"
+          fi
+
+      - name: Frontend - Lint (if configured)
+        run: |
+          if [ -d "frontend" ]; then
+            cd frontend
+            if grep -q "\"lint\":" package.json; then
+              npm run lint
+            else
+              echo "⚠️ No frontend lint configured"
+            fi
+          fi
+        continue-on-error: true
+
+      - name: Frontend - Build (Next.js)
+        run: |
+          if [ -d "frontend" ]; then
+            cd frontend
+            if grep -q "\"build\":" package.json; then
+              npm run build
+            else
+              echo "⚠️ No frontend build script configured"
+            fi
+          fi
+
+      - name: Verify Frontend Build Output
+        run: |
+          if [ -d "frontend/.next" ] || [ -d "frontend/out" ]; then
+            echo "✅ Build output found"
+          else
+            echo "❌ Build output missing"
+            exit 1
+          fi
